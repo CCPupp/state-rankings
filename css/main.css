@@ -1,0 +1,47 @@
+body {
+    margin: 0;
+}
+
+.navbar {
+    overflow: hidden;
+    width: 100%;
+    color: white;
+    background-color: black;
+    margin: 0;
+    top: 0;
+    position: fixed;
+}
+
+.navbar a {
+    float: left;
+    display: block;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.navbar a:hover {
+    background: #ddd;
+    color: black;
+}
+
+.main {
+    padding: 16px;
+    margin-top: 30px;
+    /* Used in this example to enable scrolling */
+}
+
+.rankings {
+    width: 45%;
+    margin-left: 5%;
+    border-style: inset;
+    min-height: 500px;
+}
+
+.stats {
+    width: 45%;
+    margin-right: 5%;
+    border-style: inset;
+    min-height: 500px;
+}
