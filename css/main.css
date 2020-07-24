@@ -32,6 +32,10 @@ body {
     /* Used in this example to enable scrolling */
 }
 
+.main a:hover {
+    background-color: #ddd;
+}
+
 .rankings {
     width: 45%;
     margin-left: 5%;
@@ -44,4 +48,17 @@ body {
     margin-right: 5%;
     border-style: inset;
     min-height: 500px;
+}
+
+/* ADD OHIO FLAG */
+
+.main ul {
+    list-style: none;
+}
+
+.main li {
+    background-image: url(../home/media/ohio-flag.png);
+    background-size: 1.5rem 1.5rem;
+    background-repeat: no-repeat;
+    padding: .2rem 0 0 2rem;
 }
