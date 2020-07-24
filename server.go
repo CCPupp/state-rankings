@@ -80,14 +80,7 @@ func writeToPlayer() {
 }
 
 func retrievePlayers(state string) string {
-	var finalString string = `<!DOCTYPE html>
-	<html>
-	<title>Default Homepage</title>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<link rel="stylesheet" type="text/css" href="css/main.css" />
-	<link rel="stylesheet" type="text/css" href="css/flexbox.css" />`
-
+	var finalString = buildHTML()
 	// Open our jsonFile
 	jsonFile, err := os.Open("data/players.json")
 	// if we os.Open returns an error then handle it
@@ -109,6 +102,7 @@ func retrievePlayers(state string) string {
 	finalString += "<ol>"
 
 	for i := 0; i < len(players.Players); i++ {
+		//TODO: sort players by rank
 		if players.Players[i].State == state {
 			finalString += ("<li><p>Name: " + players.Players[i].Name + "</p>")
 			finalString += ("<p>State: " + players.Players[i].State + "</p>")
@@ -136,4 +130,17 @@ func find(slice []string, val string) (int, bool) {
 		}
 	}
 	return -1, false
+}
+
+func buildHTML() string {
+	var finalString string = `<!DOCTYPE html>
+	<html>
+	<title>Default Homepage</title>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="stylesheet" type="text/css" href="css/main.css" />
+	<link rel="stylesheet" type="text/css" href="css/flexbox.css" />
+	<link rel="stylesheet" type="text/css" href="css/normalize.css" />
+	<ol>`
+	return finalString
 }
