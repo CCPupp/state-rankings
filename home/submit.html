@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<title>Default Homepage</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" type="text/css" href="css/main.css" />
+<link rel="stylesheet" type="text/css" href="css/flexbox.css" />
+<link rel="stylesheet" type="text/css" href="css/normalize.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="scripts/main.js"></script>
+
+<body>
+    <div class="navbar">
+        <a href="/">Home</a>
+    </div>
+    <div class="flex-container">
+        <div class="main">
+            <form class="submit-form">
+                <h2><label for="id">ID:</label></h2>
+                <input type="text" id="id" name="id" />
+            </form>
+            <button id="submitPlayer">Submit</button>
+            <div id="response"></div>
+        </div>
+        <div class="main">
+            <h2>HOW?</h2>
+            <p>
+                I parse all the relevant info once a day at midnight from all user's profiles. It can also be manually updated from the list page.
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

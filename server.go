@@ -4,10 +4,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"sort"
 	"strconv"
 
 	_ "github.com/bmizerany/pq"
@@ -25,6 +27,7 @@ type Player struct {
 	State string `json:"state"`
 	Rank  int    `json:"rank"`
 	Name  string `json:"name"`
+	ID    int    `json:"id"`
 }
 
 func main() {
@@ -47,23 +50,32 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path[1:] == "" {
 			http.ServeFile(w, r, "home/index.html")
-		} else if r.URL.Path[1:] == "states/ohio" {
-			fmt.Fprintf(w, retrievePlayers("ohio"))
+		} else if r.URL.Path[1:7] == "states" {
+			fmt.Fprintf(w, retrievePlayers(r.URL.Path[8:]))
 		} else {
 			http.ServeFile(w, r, "home/"+r.URL.Path[1:]+".html")
 		}
 	})
 
-	// Clears the output
-	http.HandleFunc("/clear", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "")
+	// Serve /submitPlayer with a text response.
+	http.HandleFunc("/submitPlayer", func(w http.ResponseWriter, r *http.Request) {
+		// Parses Form
+		err := r.ParseForm()
+		if err != nil {
+			http.Error(w, fmt.Sprintf("error parsing url %v", err), 500)
+		}
+		// Extracts information passed from AJAX statement on examplesubmitPlayer.html
+		id := r.FormValue("ID")
+		idInt, _ := strconv.Atoi(id)
+		writeToPlayer(getUserInfo(idInt))
+		fmt.Fprintf(w, "Success!")
 	})
 
 	//Serves local webpage for testing
 	if true {
 		errhttp := http.ListenAndServe(":8080", nil)
 		if errhttp != nil {
-			log.Fatal("Web server (HTTPS): ", errhttp)
+			log.Fatal("Web server (HTTP): ", errhttp)
 		}
 	} else {
 		//Serves the webpage
@@ -75,12 +87,54 @@ func main() {
 
 }
 
-func writeToPlayer() {
+func getUserInfo(id int) Player {
+	//var finalPlayer Player
+	//TODO: Parse user info from osu website
+	// Make HTTP GET request
+	response, err := http.Get("https://osu.ppy.sh/user/17785281")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer response.Body.Close()
+
+	// Copy data from the response to standard output
+	rawHTML, err := io.Copy(os.Stdout, response.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Number of bytes copied to STDOUT:", rawHTML)
+
+	//return finalPlayer
+	return Player{ID: id, Rank: 1234567, Name: "Test", State: "ohio"}
+}
+
+func writeToPlayer(newPlayer Player) {
+	// Open our jsonFile
+	jsonFile, err := os.Open("data/players.json")
+	// if we os.Open returns an error then handle it
+	if err != nil {
+		fmt.Println(err)
+	}
+	// defer the closing of our jsonFile so that we can parse it later on
+	defer jsonFile.Close()
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+
+	var currentList Players
+	json.Unmarshal(byteValue, &currentList)
+
+	// add further value into it
+	currentList.Players = append(currentList.Players, Player{ID: newPlayer.ID, Rank: newPlayer.Rank, Name: newPlayer.Name, State: newPlayer.State})
+
+	// now Marshal it
+	finalList, _ := json.Marshal(currentList)
+
+	err = ioutil.WriteFile("data/players.json", finalList, 0644)
 
 }
 
 func retrievePlayers(state string) string {
-	var finalString = buildHTML()
+	var finalString = buildHTMLHeader()
 	// Open our jsonFile
 	jsonFile, err := os.Open("data/players.json")
 	// if we os.Open returns an error then handle it
@@ -99,7 +153,15 @@ func retrievePlayers(state string) string {
 	// jsonFile's content into 'players' which we defined above
 	json.Unmarshal(byteValue, &players)
 
-	finalString += "<ol>"
+	players = sortPlayers(players)
+
+	finalString += `<body>
+    <div class="navbar">
+        <a href="/">Home</a>
+    </div>
+
+	<div class="main">
+	<ol>`
 
 	for i := 0; i < len(players.Players); i++ {
 		//TODO: sort players by rank
@@ -110,9 +172,9 @@ func retrievePlayers(state string) string {
 		}
 	}
 
-	finalString += `</ol></body>
+	finalString += `</ol></div></body>`
 
-	</html>`
+	finalString += buildHTMLFooter()
 
 	return finalString
 }
@@ -132,15 +194,27 @@ func find(slice []string, val string) (int, bool) {
 	return -1, false
 }
 
-func buildHTML() string {
-	var finalString string = `<!DOCTYPE html>
+func buildHTMLHeader() string {
+	var finalHeader string = `<!DOCTYPE html>
 	<html>
 	<title>Default Homepage</title>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<link rel="stylesheet" type="text/css" href="css/main.css" />
-	<link rel="stylesheet" type="text/css" href="css/flexbox.css" />
-	<link rel="stylesheet" type="text/css" href="css/normalize.css" />
-	<ol>`
-	return finalString
+	<link rel="stylesheet" type="text/css" href="../css/main.css" />
+	<link rel="stylesheet" type="text/css" href="../css/flexbox.css" />
+	<link rel="stylesheet" type="text/css" href="../css/normalize.css" />`
+	return finalHeader
+}
+
+func buildHTMLFooter() string {
+	var finalFooter string = `</html>`
+	return finalFooter
+}
+
+func sortPlayers(list Players) Players {
+	sort.SliceStable(list.Players, func(i, j int) bool {
+		return list.Players[i].Rank < list.Players[j].Rank
+	})
+
+	return list
 }
