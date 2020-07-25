@@ -50,13 +50,14 @@ body {
     min-height: 500px;
 }
 
+
 /* ADD OHIO FLAG */
 
 .main ul {
     list-style: none;
 }
 
-.main li {
+.main li .ohio {
     background-image: url(../home/media/ohio-flag.png);
     background-size: 1.5rem 1.5rem;
     background-repeat: no-repeat;

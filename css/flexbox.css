@@ -4,10 +4,21 @@
 }
 
 .flex-container {
+    margin-top: 5%;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
 }
 
 .flex-object {
     margin: 2%;
+}
+
+.flex-left {
+    display: flex;
+    justify-content: left;
+}
+
+.flex-right {
+    display: flex;
+    justify-content: right;
 }
